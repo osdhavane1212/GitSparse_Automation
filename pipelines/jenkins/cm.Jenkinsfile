@@ -2,36 +2,36 @@ pipeline {
   agent any
   options { skipDefaultCheckout(true) }
   environment {
-    REPO_URL = 'https://github.com/osdhavane1212/GitSparse_Automation.git'   // change this
+    // change the URL below to your repo
+    REPO_URL = 'https://github.com/osdhavane1212/GitSparse_Automation.git'
   }
   stages {
-    stage('Checkout (sparse)') {
+    stage('Checkout (partial + sparse)') {
       steps {
-        checkout([
-          $class: 'GitSCM',
-          branches: [[name: '*/main']],
-          userRemoteConfigs: [[url: env.REPO_URL]],
-          extensions: [
-            [$class: 'CleanBeforeCheckout'],
-            [$class: 'CloneOption', shallow: true, depth: 10, noTags: true],
-            [$class: 'SparseCheckoutPaths', sparseCheckoutPaths: [
-              [path: 'core/'], [path: 'config/'], [path: 'data/common/'],
-              [path: 'products/cm/'], [path: 'data/products/cm/'],
-              [path: '/package.json'], [path: '/package-lock.json'],
-              [path: '/playwright.config.ts'], [path: '/tsconfig.json']
-            ]]
-          ]
-        ])
+        deleteDir()
+        script {
+          def cmd = 'git clone --filter=blob:none --depth 1 ' +
+                    '--sparse --no-tags --branch main ' +
+                    env.REPO_URL + ' . && ' +
+                    'git sparse-checkout set core config data/common ' +
+                    'products/cm data/products/cm'
+          if (isUnix()) { sh cmd } else { bat cmd }
+        }
       }
     }
     stage('Show what was pulled') {
-      steps { script { if (isUnix()) { sh 'ls products' } else { bat 'dir products' } } }
+      steps {
+        script {
+          if (isUnix()) { sh 'ls products' } else { bat 'dir products' }
+        }
+      }
     }
     stage('Test') {
       steps {
         script {
-          if (isUnix()) { sh 'npm ci && npx playwright install chromium && npx playwright test products/cm' }
-          else          { bat 'npm ci && npx playwright install chromium && npx playwright test products/cm' }
+          def cmd = 'npm ci && npx playwright install chromium && ' +
+                    'npx playwright test products/cm'
+          if (isUnix()) { sh cmd } else { bat cmd }
         }
       }
     }
