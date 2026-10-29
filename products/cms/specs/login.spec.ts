@@ -17,4 +17,9 @@ test.describe('CMS', () => {
     const out = await runRemote(getEnv('cms').sshHost, 'uname -a');
     expect(out).toContain('cms');
   });
+
+  test('CMS remote command (mock SSH)', async () => {
+    const out = await runRemote(getEnv('cms').sshHost, 'uname -a');
+    expect(out).toContain('cms');
+  });
 });
