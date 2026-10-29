@@ -1,4 +1,4 @@
-# Aura_Automation (practice monorepo)
+# Sparse_Checkout_Automation (practice monorepo)
 
 TypeScript + Playwright. One repo, one folder per product.
 
