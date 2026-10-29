@@ -4,6 +4,7 @@ export type EnvName = 'dev' | 'prod';
 export interface ProductEnv {
   baseUrl: string;
   sshHost: string;
+  //Yes
 }
 
 export const environments: Record<string, Record<EnvName, ProductEnv>> = {
